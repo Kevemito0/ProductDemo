@@ -4,6 +4,7 @@ import com.products.demo.service.ProductService;
 import com.products.demo.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,4 +34,6 @@ public class ProductController {
     {
         productService.deleteProductById(id);
     }
+
+    //WebClient webClient = WebClient.create("http://localhost:8080");
 }
