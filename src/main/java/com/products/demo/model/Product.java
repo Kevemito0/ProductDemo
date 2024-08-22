@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 
 @Entity (name = "product")
