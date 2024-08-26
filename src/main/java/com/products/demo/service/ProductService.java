@@ -73,10 +73,24 @@ public class ProductService {
     public Mono<Category> getCategoryByproduct(String product){
         return webClient.get().uri("/api/Categories/product/{product}",product).retrieve().bodyToMono(Category.class);
     }
+
+    public Mono<Product> createProductAndBarcode(Product product){
+        Product savedProduct = productRepo.save(product);
+        String catcode = savedProduct.getCategory_code();
+        return webClient.post().uri("/api/Categories/barcodeGenerator/{category_code}",catcode).bodyValue(savedProduct.getCategory_code()).retrieve().bodyToMono(Category.class)
+                .flatMap((barcodes -> {
+                    String selectedBarcode = barcodes.getProductCode();
+                    savedProduct.setCode(selectedBarcode);
+                    productRepo.save(savedProduct);
+                    return Mono.just(savedProduct);
+                }));
+    }
+
+
     //generating only product barcode
-    private String generateRandomBarcode(String code)
+    private String generateRandomBarcode(String code, int length)
     {
-        int barcodelength = 5;
+        int barcodelength = length;
         String barcodeLetter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         StringBuilder barcode = new StringBuilder (code);
         for(int i = 2; i < barcodelength; i++)
@@ -88,15 +102,15 @@ public class ProductService {
     }
     public Mono<Product> updateProductBarcode(Long id) {
         return Mono.defer(() -> {
-            Optional<Product> productOptional = productRepo.findById(id);  // Blocking call
+            Optional<Product> productOptional = productRepo.findById(id);
             if (productOptional.isPresent()) {
                 Product product = productOptional.get();
                 return getCategoryBykasa("1234")
                         .flatMap(category -> {
                             String newBarcode = category.getKasaCode();
                             product.setCode(newBarcode);
-                            productRepo.save(product);  // Blocking call
-                            return Mono.just(product);  // Wrap in Mono
+                            productRepo.save(product);
+                            return Mono.just(product);
                         });
             } else {
                 return Mono.empty();
@@ -123,20 +137,4 @@ public class ProductService {
     } */
 }
 
-    /*
-    public ProductResponse getProductByIdExternal(long id){
-        Optional<Product> product = productRepo.findById(id);
-
-        ProductResponse productResponse = new ProductResponse();
-
-        productResponse.setId(product.get().getId());
-        productResponse.setName(product.get().getName());
-        productResponse.setUnit(product.get().getUnit());
-        productResponse.setCategory_code(product.get().getCategory_code());
-        productResponse.setCode(product.get().getCode());
-        productResponse.setBrand(product.get().getBrand());
-
-        return productResponse;
-    }
-    */
 

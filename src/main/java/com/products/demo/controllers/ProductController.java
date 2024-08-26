@@ -1,10 +1,12 @@
 package com.products.demo.controllers;
 
 import com.products.demo.model.Category;
+import com.products.demo.model.dto.CategoryDTO;
 import com.products.demo.response.ProductResponse;
 import com.products.demo.service.ProductService;
 import com.products.demo.model.Product;
 import com.products.demo.webtest.GreetingController;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -13,24 +15,23 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("api/Products")
+@RequiredArgsConstructor
 public class ProductController {
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private GreetingController greeting;
+
+    private final ProductService productService;
+
+
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
-
-    @GetMapping("/hello")
-    public Map<String, String> sayHello() {return greeting.sayHello(); }
 
     @GetMapping("/{id}")
     public Optional<Product> getProductById(@PathVariable Long id)
@@ -71,6 +72,11 @@ public class ProductController {
         return productService.saveProduct(product);
     }
 
+    @PostMapping("/externalbarcode")
+    public Mono<Product> createProductAndBarcode(@RequestBody Product product){
+        return productService.createProductAndBarcode(product);
+    }
+
     @PostMapping("/externalPost")
     public Mono<Product> externalCreateProduct(@RequestBody Product product)
     {
@@ -92,6 +98,11 @@ public class ProductController {
     }
     @GetMapping("/external/terazi/{terazi}")
     public Mono<Category>getCategoryByTerazi(@PathVariable String terazi){
+
+    /*
+        List<CategoryDTO> categoryDTO = new ArrayList<>();
+        categoryDTO.stream().map(CategoryDTO::getId);
+        */
         return productService.getCategoryByterazi(terazi);
     }
 

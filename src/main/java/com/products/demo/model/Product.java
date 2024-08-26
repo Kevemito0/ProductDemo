@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 
-@Entity (name = "product")
+@Entity
 @Getter
 @Setter
 @Table (name = "product")
@@ -16,8 +16,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 2)
-    private String category_code;
+    @Column(name = "category_code", nullable = false, length = 2)
+    private String categoryCode;
 
     @Column(nullable = false,unique = true)
     private String name;
