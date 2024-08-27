@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private final WebClient webClient;
+
     @Autowired
     private ProductRepo productRepo;
 
@@ -76,8 +80,8 @@ public class ProductService {
 
     public Mono<Product> createProductAndBarcode(Product product){
         Product savedProduct = productRepo.save(product);
-        String catcode = savedProduct.getCategory_code();
-        return webClient.post().uri("/api/Categories/barcodeGenerator/{category_code}",catcode).bodyValue(savedProduct.getCategory_code()).retrieve().bodyToMono(Category.class)
+        String catcode = savedProduct.getCategoryCode();
+        return webClient.post().uri("/api/Categories/barcodeGenerator/{category_code}",catcode).bodyValue(savedProduct.getCategoryCode()).retrieve().bodyToMono(Category.class)
                 .flatMap((barcodes -> {
                     String selectedBarcode = barcodes.getProductCode();
                     savedProduct.setCode(selectedBarcode);

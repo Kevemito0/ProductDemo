@@ -33,6 +33,7 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+
     @GetMapping("/{id}")
     public Optional<Product> getProductById(@PathVariable Long id)
     {
