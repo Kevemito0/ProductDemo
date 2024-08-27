@@ -16,13 +16,17 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "category_code", nullable = false, length = 2)
+
+    @Column (name = "barcode",nullable = false)
+    private String barcode;
+
+    @Column(name = "categoryCode", nullable = false, length = 2)
     private String categoryCode;
 
     @Column(nullable = false,unique = true)
     private String name;
 
-    @Column(nullable = false,length = 9,unique = true)
+    @Column(name = "code", nullable = false,length = 5,unique = true)
     private String code;
 
     @Column(nullable = false)

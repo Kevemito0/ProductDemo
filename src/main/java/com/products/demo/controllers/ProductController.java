@@ -40,43 +40,48 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @GetMapping("/code/{code}")
-    public Mono<Product> getProductByCode(@PathVariable String code) {
-        return productService.getProductByCode(code);
-    }
-
-    @GetMapping("/external/{id}")
-    public Mono<Product> getExternalProduct(@PathVariable String id){
-        return productService.getProductFromOtherService(id);
-    }
-
     @GetMapping("/external")
-    public Mono<List<Product>>getAllProductsExternal(){
-        return productService.getAllProductsExternal();
+    public List<Category> getAllCategories(){
+        return productService.getAllCategories();
+    }
+    @GetMapping("/external/{id}")
+    public Category getExternalCategory(@PathVariable Long id)
+    {
+        return productService.getExternalCategory(id);
+    }
+    @PostMapping
+    public Product createProduct(@RequestBody Product product) {
+        return productService.saveProduct(product);
     }
 
-    @PutMapping("/{id}/update-barcode")
-    public Mono<Product> updateProductBarcode(@PathVariable Long id) {
-        return productService.updateProductBarcode(id);
+    @DeleteMapping("/{id}")
+    public void deleteProductById(@PathVariable Long id) {
+        productService.deleteProductById(id);
+    }
+
+    @PostMapping("/externalbarcode")
+    public Product createProductAndBarcode(@RequestBody Product product){
+        return productService.createProductAndBarcode(product);
+    }
+    @PutMapping("{id}/update")
+    public Product changeProductBarcode(@PathVariable Long id) {
+        return productService.changeProductBarcode(id);
     }
     /*
-    @GetMapping("/other/{id}")
-    private ResponseEntity<ProductResponse>getProductFromOtherService(@PathVariable("id") long id){
-        ProductResponse product = productService.getProductByIdExternal(id);
-        return ResponseEntity.status(HttpStatus.OK).body(product);
+    @GetMapping("/code/{code}")
+    public Optional<Product> getProductByCode(@PathVariable String code) {
+        return productService.getProductByCode(code);
     }
     */
 
+    /*
     @PostMapping
     public Product createProduct(@RequestBody Product product)
     {
         return productService.saveProduct(product);
     }
 
-    @PostMapping("/externalbarcode")
-    public Mono<Product> createProductAndBarcode(@RequestBody Product product){
-        return productService.createProductAndBarcode(product);
-    }
+
 
     @PostMapping("/externalPost")
     public Mono<Product> externalCreateProduct(@RequestBody Product product)
@@ -103,7 +108,7 @@ public class ProductController {
     /*
         List<CategoryDTO> categoryDTO = new ArrayList<>();
         categoryDTO.stream().map(CategoryDTO::getId);
-        */
+
         return productService.getCategoryByterazi(terazi);
     }
 
@@ -111,4 +116,5 @@ public class ProductController {
     public Mono<Category>getCategoryByproduct(@PathVariable String product){
         return productService.getCategoryByproduct(product);
     }
+    */
 }

@@ -3,6 +3,7 @@ package com.products.demo.service;
 import com.products.demo.repo.ProductRepo;
 import com.products.demo.model.Product;
 import com.products.demo.model.Category;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -10,33 +11,37 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Random;
 import java.util.Optional;
-
+@RestController
+@RequestMapping("/api/Products")
+@RequiredArgsConstructor
 @Service
 public class ProductService {
-    private final WebClient webClient;
-
+    private final RestClient restClient;
+    String baseUrl = "http://localhost:8080/api/Categories";
     @Autowired
     private ProductRepo productRepo;
 
     private Random random = new Random();
 
 
-    @Autowired
-    public ProductService(WebClient.Builder webClientBuilder, ProductRepo productRepo) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8080").defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
-        this.productRepo = productRepo;
-    }
-
     public List<Product> getAllProducts(){
         return productRepo.findAll();
     }
+    public List<Category> getAllCategories(){
+        return restClient.get().uri(baseUrl).retrieve().body(List.class);
+    }
 
+    public Category getExternalCategory(Long id){
+        return restClient.get().uri(baseUrl + "/{id}",id).retrieve().body(Category.class);
+    }
     public Optional<Product> getProductById(Long id){
         return productRepo.findById(id);
     }
@@ -48,9 +53,9 @@ public class ProductService {
     public void deleteProductById(Long id){
         productRepo.deleteById(id);
     }
-
+    /*
     public Mono<Product> getProductFromOtherService(String id){
-        return webClient.get().uri("/api/service1/Products/{id}",id).retrieve().bodyToMono(Product.class);
+        return RestClient.get().uri("/api/service1/Products/{id}",id).retrieve().bodyToMono(Product.class);
     }
     public Mono<List<Product>> getAllProductsExternal(){
         return webClient.get().uri("/api/service1/Products").retrieve().bodyToMono(new ParameterizedTypeReference<List<Product>>() {});
@@ -77,20 +82,33 @@ public class ProductService {
     public Mono<Category> getCategoryByproduct(String product){
         return webClient.get().uri("/api/Categories/product/{product}",product).retrieve().bodyToMono(Category.class);
     }
-
-    public Mono<Product> createProductAndBarcode(Product product){
-        Product savedProduct = productRepo.save(product);
-        String catcode = savedProduct.getCategoryCode();
+    */
+    public Product createProductAndBarcode(Product product){
+        productRepo.save(product);
+        if(product.getId() != null) {
+            product.setBarcode(restClient.post().uri(baseUrl + "/create").
+                    contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(Category.class)
+                    .getProductCode());
+        }
+            return productRepo.save(product);
+        /*
         return webClient.post().uri("/api/Categories/barcodeGenerator/{category_code}",catcode).bodyValue(savedProduct.getCategoryCode()).retrieve().bodyToMono(Category.class)
                 .flatMap((barcodes -> {
                     String selectedBarcode = barcodes.getProductCode();
                     savedProduct.setCode(selectedBarcode);
                     productRepo.save(savedProduct);
-                    return Mono.just(savedProduct);
                 }));
+                */
     }
-
-
+    public Product changeProductBarcode(Long id){
+        Product product = getProductById(id).get();
+        String productCode = product.getBarcode();
+        product.setBarcode(restClient.get().uri(baseUrl + "/barcode/{barcode}",productCode).retrieve().body(Category.class).getCashregCode());
+        return productRepo.save(product);
+    }
+    /*
     //generating only product barcode
     private String generateRandomBarcode(String code, int length)
     {
@@ -121,7 +139,7 @@ public class ProductService {
             }
         });
     }
-    /*
+
     public Product updateProductBarcode(Long id){
         Optional<Product> productOptional = productRepo.findById(id);
         String productBaseCode;

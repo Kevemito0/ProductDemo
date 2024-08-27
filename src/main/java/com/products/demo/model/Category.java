@@ -15,8 +15,8 @@ public class Category {
 
     private String productCode;
 
-    private String teraziCode;
+    private String scaleCode;
 
-    private String kasaCode;
+    private String cashregCode;
 
 }
