@@ -1,6 +1,7 @@
 package com.products.demo.controllers;
 
 import com.products.demo.model.Category;
+import com.products.demo.model.CategoryDemo;
 import com.products.demo.model.dto.CategoryDTO;
 import com.products.demo.response.ProductResponse;
 import com.products.demo.service.ProductService;
@@ -40,9 +41,18 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
+    @GetMapping("/code/{code}")
+    public Optional<Product> getProductByCode(@PathVariable String code){return productService.getProductBycode(code);}
+
     @GetMapping("/external")
     public List<Category> getAllCategories(){
         return productService.getAllCategories();
+    }
+
+    @GetMapping("{prodid}/categoryName")
+    public CategoryDemo getExternalCategoryDemo(@PathVariable Long prodid){
+        Long prodCategoryid = getProductById(prodid).get().getCategoryCode();
+        return productService.getExternalCategoryDemo(prodCategoryid);
     }
     @GetMapping("/external/{id}")
     public Category getExternalCategory(@PathVariable Long id)
@@ -63,9 +73,9 @@ public class ProductController {
     public Product createProductAndBarcode(@RequestBody Product product){
         return productService.createProductAndBarcode(product);
     }
-    @PutMapping("{id}/update")
-    public Product changeProductBarcode(@PathVariable Long id) {
-        return productService.changeProductBarcode(id);
+    @PutMapping("{id}/update/{place}")
+    public Product changeProductBarcode(@PathVariable Long id, @PathVariable int place) {
+        return productService.changeProductBarcode(id,place);
     }
     /*
     @GetMapping("/code/{code}")

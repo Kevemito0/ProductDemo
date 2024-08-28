@@ -5,7 +5,10 @@ import lombok.Setter;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+enum Units{
+    Kilogram,
+    Adet
+}
 
 @Entity
 @Getter
@@ -20,8 +23,8 @@ public class Product {
     @Column (name = "barcode",nullable = false)
     private String barcode;
 
-    @Column(name = "categoryCode", nullable = false, length = 2)
-    private String categoryCode;
+    @Column(name = "categoryCode", nullable = false)
+    private Long categoryCode;
 
     @Column(nullable = false,unique = true)
     private String name;
@@ -32,7 +35,7 @@ public class Product {
     @Column(nullable = false)
     private String brand;
 
-    @Column(nullable = false)
-    private String unit;
+    @Enumerated(EnumType.STRING)
+    private Units unit;
 
 }
